@@ -1,0 +1,257 @@
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Girlane de Oliveira Costa">
+    <meta name="keywords" content="pet, shop, cachorro, gato, ração, aguas lindas, machado, tosa, banho">
+    <meta name="description" content="agropet shop machado estamos localizados em aguas lindas, temos 🛁 Banho e tosa 🎀Acessórios 💊Medicamentos 🚕Táxi dog venha conferir.">
+    <title>Agropet Shop Machado</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+            }
+        }
+    </script>
+    <script src="app.js" type="module"></script>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="logo">
+                <img src="/logo.png" alt="Agropet Shop Machado Logo" width="77" height="77">
+                <h1><a href="#" @click.prevent="selectedCategory = 'all'" style="color: inherit; text-decoration: none;"><span style="color: #ff0000;">A</span>gropet Shop <span style="color: #ff0000;">M</span>achado</a></h1>
+            </div>
+            <div class="nav-right">
+                <div class="search-container">
+                    <input type="text" placeholder="Pesquisar..." v-model="searchQuery" @keyup.enter="search">
+                    <button @click="search" class="search-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <nav>
+            <ul class="category-nav">
+                <li><a href="#" @click.prevent="selectedCategory = 'all'" :class="{ active: selectedCategory === 'all' }">Todas as Categorias</a></li>
+                <li><a href="#" @click.prevent="selectedCategory = 'baths'" :class="{ active: selectedCategory === 'baths' }">Banhos & Tosa</a></li>
+                <li><a href="#" @click.prevent="selectedCategory = 'products'" :class="{ active: selectedCategory === 'products' }">Produtos para Pets</a></li>
+                <li><a href="#" @click.prevent="selectedCategory = 'promotions'" :class="{ active: selectedCategory === 'promotions' }">Promoções</a></li>
+                <li><a href="#" @click.prevent="selectedCategory = 'search-results'" :class="{ active: selectedCategory === 'search-results' }">Resultados da Pesquisa</a></li>
+            </ul>
+            <select class="category-select" v-model="selectedCategory">
+                <option value="all">Todas as Categorias</option>
+                <option value="baths">Banhos & Tosa</option>
+                <option value="products">Produtos para Pets</option>
+                <option value="promotions">Promoções</option>
+                <option value="search-results">Resultados da Pesquisa</option>
+            </select>
+        </nav>
+        
+        <main>
+            <!-- Search Results Section -->
+            <div class="search-results" v-if="selectedCategory === 'search-results'">
+                <h2>Resultados da Pesquisa para "{{ searchQuery }}"</h2>
+                
+                <div v-if="searchResults && searchResults.hasResults">
+                    <div v-if="searchResults.pets.length > 0">
+                        <h3>Animais</h3>
+                        <div class="pet-gallery">
+                            <div class="pet-card" v-for="pet in searchResults.pets" :key="pet.id">
+                                <div class="pet-image">
+                                    <img :src="pet.image" alt="Pet" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+                                </div>
+                                <h3>{{ pet.name }}</h3>
+                                <p>{{ pet.breed }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div v-if="searchResults.products.length > 0">
+                        <h3>Produtos</h3>
+                        <div class="product-gallery">
+                            <div class="product-card" v-for="product in searchResults.products" :key="product.id">
+                                <div class="product-image" :style="`background-color: ${product.color}`">
+                                    <svg width="60" height="60" viewBox="0 0 100 100">
+                                        <rect x="20" y="30" width="60" height="50" :fill="product.color" rx="5"/>
+                                        <circle v-if="product.category === 'food'" cx="50" cy="50" r="20" fill="#fdca49"/>
+                                        <rect v-if="product.category === 'toy'" x="35" y="35" width="30" height="30" fill="#faab00" rx="5"/>
+                                        <path v-if="product.category === 'accessory'" d="M30,40 L70,40 L65,70 L35,70 Z" fill="#ffa927"/>
+                                    </svg>
+                                </div>
+                                <h3>{{ product.name }}</h3>
+                                <p>{{ product.description }}</p>
+                                <p class="product-price">R${{ product.price }}</p>
+                                <button @click="addToCart(product)" class="add-to-cart">Adicionar ao Carrinho</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div v-if="searchResults.services.length > 0">
+                        <h3>Serviços</h3>
+                        <div class="services-gallery">
+                            <div class="service-card" v-for="service in searchResults.services" :key="service.id">
+                                <div class="service-image" :style="`background-color: ${service.color}`">
+                                    <img v-if="service.image" :src="service.image" alt="Service" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+                                    <svg v-else width="60" height="60" viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="40" :fill="service.color"/>
+                                        <path v-if="service.type === 'bath'" d="M30,60 Q50,70 70,60 Q75,40 50,35 Q25,40 30,60" fill="#fffeea"/>
+                                        <path v-if="service.type === 'haircut'" d="M30,50 L70,50 M40,40 L60,40 M45,30 L55,30" stroke="#fffeea" stroke-width="5" fill="none"/>
+                                        <path v-else-if="service.type === 'spa'" d="M30,40 L70,40 M30,50 L70,50 M30,60 L70,60" stroke="#fffeea" stroke-width="5" fill="none"/>
+                                        <path v-else-if="service.type === 'spa'" d="M30,40 L70,40 M30,50 L70,50 M30,60 L70,60" stroke="#fffeea" stroke-width="5" fill="none"/>
+                                        <rect v-else-if="service.type === 'spa'" x="30" y="40" width="40" height="25" fill="#fffeea" rx="5"/>
+                                    </svg>
+                                </div>
+                                <h3>{{ service.name }}</h3>
+                                <p>{{ service.description }}</p>
+                                <p class="service-price">R${{ service.price }}</p>
+                                <button @click="addToCart(service)" class="add-to-cart">Agendar Agora</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div v-else class="no-results">
+                    <h3>Nenhum resultado encontrado para "{{ searchQuery }}"</h3>
+                    <p>Tente pesquisar com palavras diferentes ou navegue pelas categorias.</p>
+                </div>
+            </div>
+            
+            <div class="services" v-if="selectedCategory === 'all' || selectedCategory === 'baths'">
+                <h2>Serviços de Banho</h2>
+                <div class="services-gallery">
+                    <div class="service-card" v-for="service in services" :key="service.id">
+                        <div class="service-image" :style="`background-color: ${service.color}`">
+                            <img :src="service.image" alt="Service" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+                        </div>
+                        <h3>{{ service.name }}</h3>
+                        <p>{{ service.description }}</p>
+                        <p class="service-price">R${{ service.price.toFixed(2) }}</p>
+                        <button @click="addToCart(service)" class="add-to-cart">Agendar Agora</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="additional-services" v-if="selectedCategory === 'all' || selectedCategory === 'baths'">
+                <h2>ADICIONAIS</h2>
+                <div class="services-gallery">
+                    <div class="service-card" v-for="service in additionalServices" :key="service.id">
+                        <div class="service-image" :style="`background-color: ${service.color}`">
+                            <img v-if="service.image" :src="service.image" alt="Service" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+                            <svg v-else width="60" height="60" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="40" :fill="service.color"/>
+                                <path v-if="service.name.includes('Unhas')" d="M35,35 L45,45 M55,35 L65,45 M35,65 L45,55 M55,65 L65,55" stroke="#fffeea" stroke-width="5" fill="none"/>
+                                <path v-else-if="service.name.includes('Patinha')" d="M30,50 Q40,30 50,50 Q60,30 70,50" stroke="#fffeea" stroke-width="5" fill="none"/>
+                                <path v-else-if="service.name.includes('Tosa')" d="M30,40 L70,40 M30,50 L70,50 M30,60 L70,60" stroke="#fffeea" stroke-width="5" fill="none"/>
+                                <path v-else-if="service.name.includes('Desembolo')" d="M30,50 Q40,30 50,50 Q60,70 70,50" stroke="#fffeea" stroke-width="3" fill="none" stroke-dasharray="5,2"/>
+                            </svg>
+                        </div>
+                        <h3>{{ service.name }}</h3>
+                        <p>{{ service.description }}</p>
+                        <p class="service-price">R${{ service.price.toFixed(2) }}</p>
+                        <button @click="addToCart(service)" class="add-to-cart">Adicionar Serviço</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grooming-services" v-if="selectedCategory === 'all' || selectedCategory === 'baths'">
+                <h2>TOSAS</h2>
+                <div class="services-gallery">
+                    <div class="service-card" v-for="service in groomingServices" :key="service.id">
+                        <div class="service-image" :style="`background-color: ${service.color}`">
+                            <img :src="service.image" alt="Service" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+                        </div>
+                        <h3>{{ service.name }}</h3>
+                        <p>{{ service.description }}</p>
+                        <p class="service-price">R${{ service.price.toFixed(2) }}</p>
+                        <button @click="addToCart(service)" class="add-to-cart">Agendar Agora</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="promotions" v-if="selectedCategory === 'all' || selectedCategory === 'promotions'">
+                <h2>Ofertas Especiais</h2>
+                <div class="promotions-gallery">
+                    <div class="promo-card" v-for="promo in promotions" :key="promo.id">
+                        <div class="promo-banner" :style="`background-color: ${promo.color}`">
+                            <h3>{{ promo.name }}</h3>
+                            <p class="promo-discount" v-if="promo.discount">{{ promo.discount }}% OFF</p>
+                            <p class="promo-discount" v-else-if="promo.price">R${{ promo.price.toFixed(2) }}</p>
+                        </div>
+                        <div class="promo-details">
+                            <p>{{ promo.description }}</p>                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="featured-products" v-if="selectedCategory === 'all' || selectedCategory === 'products'">
+                <h2>Produtos Populares</h2>
+                <div class="product-gallery">
+                    <div class="product-card" v-for="product in featuredProducts" :key="product.id">
+                        <div class="product-image" :style="`background-color: ${product.color}`">
+                            <img :src="product.image" alt="Product" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+                        </div>
+                        <h3>{{ product.name }}</h3>
+                        <p>{{ product.description }}</p>
+                        <p class="product-price">Consulte os preços com nossos atendentes</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <div class="footer-content">
+                <div class="footer-logo">
+                     <img src="/logo.png" alt="Agropet Shop Machado Logo" width="77" height="77">
+                    <p><span style="color: #ff0000;">A</span>gropet Shop <span style="color: #ff0000;">M</span>achado</p>
+                </div>
+                <div class="footer-links">
+                  <h3>Ajuda</h3>
+                    <a href="#" class="about-us-link">Sobre Nós</a>
+                    <a target="_blank" href="https://api.whatsapp.com/message/VM7TBCNANRH7O1?autoload=1&app_absent=0">Contato: (61) 9412-1273</a>
+                    <a target="_blank" href="https://www.google.com/maps/search/AV+TANCREDO+NEVES+QUADRA+62+LOTE+01+02+JARDIM+P%C3%89ROLA+%7C%7C+-+Cidade+Jardim,+%C3%81guas+Lindas+de+Goi%C3%A1s+-+GO,+72910-000,+Brasil/@-15.7387,-48.2597,17z?hl=pt-BR&entry=ttu&g_ep=EgoyMDI1MDMxMi4wIKXMDSoJLDEwMjExNDUzSAFQAw%3D%3D">Nossa Loja</a>                    
+                </div>
+                <div class="footer-hours">
+                    <h3>Horário de Funcionamento</h3>
+                    <table class="hours-table">
+                        <tr>
+                            <th>Dia</th>
+                            <th>Horário</th>
+                        </tr>
+                        <tr>
+                            <td>Segunda a Sábado</td>
+                            <td>8:00 - 17:00</td>
+                        </tr>
+                        <tr>
+                            <td>Domingo</td>
+                            <td>9:00 - 14:00</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Agropet Shop Machado. Todos os direitos reservados.</p>
+            </div>
+        </footer>
+        
+        <!-- WhatsApp Button -->
+        <a href="https://api.whatsapp.com/message/VM7TBCNANRH7O1?autoload=1&app_absent=0" target="_blank" class="whatsapp-button" title="Contato via WhatsApp">
+            <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16.004 0C7.176 0 0 7.176 0 16.004c0 2.618.642 5.195 1.872 7.492L.648 30.848l7.56-1.183a16.03 16.03 0 0 0 7.795 1.993h.007c8.824 0 15.996-7.18 15.996-16.004C32.004 7.176 24.828 0 16.004 0z" fill="#fff" fill-opacity=".3"/>
+                <path d="M25.339 22.646c-.444 1.251-2.2 2.291-3.605 2.594-0.96.203-2.216.365-6.448-1.386-5.408-2.245-8.889-7.748-9.161-8.104-.261-.356-2.2-2.925-2.2-5.579 0-2.654 1.354-3.944 1.895-4.504.445-.46 1.175-.67 1.874-.67.228 0 .432.011.618.02.54.023.813.055 1.17.91.445 1.072 1.535 3.726 1.666 4.002.132.277.264.651.079 1.015-.174.365-.327.526-.604.835-.276.308-.54.543-.815.873-.251.28-.535.581-.218 1.102.317.519 1.408 2.227 3.027 3.606 2.084 1.776 3.841 2.328 4.389 2.585.405.193.89.145 1.188-.184.38-.42.853-.112 1.208-1.829.355-.721 1.516-.777 2.408-.598.893.184 3.452 1.626 4.045 1.918.593.292.988.438 1.131.672.143.24.143 1.363-.301 2.614z"/>
+            </svg>
+        </a>
+        
+        <!-- About Us Tooltip -->
+        <div id="about-tooltip" class="about-tooltip">
+            agropet shop machado estamos localizados em aguas lindas, temos 🛁 Banho e tosa 🎀Acessórios 💊Medicamentos 🚕Táxi dog venha conferir.
+        </div>
+    </div>
+</body>
+</html>
