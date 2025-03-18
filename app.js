@@ -6,17 +6,6 @@ createApp({
         const searchQuery = ref('');
         const selectedCategory = ref('all');
         
-        // Pet data - We're keeping this data for now but not displaying it
-        const featuredPets = ref([
-            { id: 1, name: 'Max', breed: 'Australian Shepherd', price: 899.99, image: '/dog1.jpg' },
-            { id: 2, name: 'Bella', breed: 'French Bulldog', price: 599.99, image: '/dog2.jpg' },
-            { id: 3, name: 'Charlie', breed: 'Basenji', price: 1299.99, image: '/dog3.jpg' },
-            { id: 4, name: 'Luna', breed: 'Labrador', price: 799.99, image: '/dog4.jpg' },
-            { id: 5, name: 'Cooper', breed: 'Beagle', price: 999.99, image: '/dog5.jpg' },
-            { id: 6, name: 'Daisy', breed: 'Beagle Puppy', price: 1099.99, image: '/dog6.jpg' },
-            { id: 7, name: 'Rocky', breed: 'Black Pug', price: 899.99, image: '/dog7.jpg' },
-        ]);
-        
         // Product data
         const featuredProducts = ref([
             { id: 101, name: 'Rações', description: 'Diversas marcas e sabores', category: 'food', color: '#f96a00', image: '/produto1.jpg' },
@@ -140,11 +129,6 @@ createApp({
                 }
             }
             
-            const foundPets = featuredPets.value.filter(pet => 
-                pet.name.toLowerCase().includes(query) || 
-                pet.breed.toLowerCase().includes(query)
-            );
-            
             const foundProducts = featuredProducts.value.filter(product => 
                 product.name.toLowerCase().includes(query) || 
                 product.description.toLowerCase().includes(query) ||
@@ -176,12 +160,11 @@ createApp({
             );
             
             return {
-                pets: foundPets,
                 products: foundProducts,
                 services: foundServices,
                 additionalServices: foundAdditionalServices,
                 groomingServices: foundGroomingServices,
-                hasResults: foundPets.length > 0 || foundProducts.length > 0 || 
+                hasResults: foundProducts.length > 0 || 
                            foundServices.length > 0 || foundAdditionalServices.length > 0 ||
                            foundGroomingServices.length > 0
             };
@@ -232,7 +215,6 @@ createApp({
         return {
             searchQuery,
             selectedCategory,
-            featuredPets,
             featuredProducts,
             services,
             additionalServices,
